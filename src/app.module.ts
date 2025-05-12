@@ -1,13 +1,12 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { AuditoriumModule } from './auditorium/auditorium.module';
 import { LocationModule } from './location/location.module';
-import { ShowtimeModule } from './showtime/showtime.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeOrmConfig } from './config/typeorm.config';
 import { MoviesModule } from './movies/movies.module';
+import { TheatersModule } from './theaters/theaters.module';
 
 @Module({
   imports: [ConfigModule.forRoot({
@@ -17,10 +16,8 @@ import { MoviesModule } from './movies/movies.module';
     useFactory: typeOrmConfig,
     inject: [ConfigService]
   }),
-  AuditoriumModule, 
   LocationModule, 
-  ShowtimeModule, 
-  MoviesModule],
+  MoviesModule, TheatersModule],
   controllers: [AppController],
   providers: [AppService],
 })
