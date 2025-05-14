@@ -14,9 +14,13 @@ export class CinemaRoom {
     })
     name: string;
 
-    @ManyToOne(()=> Location, location => location.rooms)
-    @JoinColumn({name: 'location_id'})
+    @Column()
+    locationId: number;
+
+    @ManyToOne(() => Location, location => location.rooms, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'locationId' }) // Asegura que esta relación use esa columna
     location: Location;
+
 
     @OneToMany(() => Movie, (movie) => movie.cinemaRoom)
     movies: Movie[];

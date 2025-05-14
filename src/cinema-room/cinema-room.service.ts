@@ -5,31 +5,44 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CinemaRoom } from './entities/cinema-room.entity';
 import { Repository } from 'typeorm';
 import { Seat } from '../seats/entities/seat.entity';
+import { Location } from '../location/entities/location.entity';
 
 @Injectable()
 export class CinemaRoomService {
   constructor(
-    @InjectRepository(CinemaRoom) private readonly cinemaRoomRepository : Repository<CinemaRoom>
+    @InjectRepository(CinemaRoom) private readonly cinemaRoomRepository : Repository<CinemaRoom>,
+    @InjectRepository(Location) private readonly locationRepository : Repository<Location>
   ){}
 
-  async create(createCinemaRoomDto: CreateCinemaRoomDto): Promise<CinemaRoom>{
-    const {name, seats} = createCinemaRoomDto;
+async create(createCinemaRoomDto: CreateCinemaRoomDto): Promise<CinemaRoom> {
+  const { name, seats, locationId } = createCinemaRoomDto;
 
-    const room = new CinemaRoom();
-    room.name = name;
-
-    room.seats = seats.map(seatData => {
-      const seat = new Seat();
-      seat.row = seatData.code;
-      seat.status = seatData.isAvailable ?? true;
-      return seat;
-    });
-    const savedRoom = await this.cinemaRoomRepository.save(room);
-    return savedRoom;
+  // Validar que exista la ubicación
+  const location = await this.locationRepository.findOneBy({ id: locationId });
+  if (!location) {
+    throw new NotFoundException(`Location with id ${locationId} not found`);
   }
 
+  const room = new CinemaRoom();
+  room.name = name;
+  room.location = location;
+
+  // Asignar los asientos
+  room.seats = seats.map(seatData => {
+    const seat = new Seat();
+    seat.row = seatData.code; // ← usa el campo real del DTO
+    seat.status = seatData.isAvailable ?? true;
+    return seat;
+  });
+
+  // Guardar sala junto con sus asientos
+  const savedRoom = await this.cinemaRoomRepository.save(room);
+  return savedRoom;
+}
+
+
   findAll() {
-    return this.cinemaRoomRepository.find()
+    return this.cinemaRoomRepository.find({ relations: ['location'] });
   }
 
   async findOne(id: number) {

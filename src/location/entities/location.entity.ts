@@ -1,4 +1,3 @@
-import { IsOptional } from "class-validator";
 import { CinemaRoom } from "../../cinema-room/entities/cinema-room.entity";
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
@@ -16,7 +15,7 @@ export class Location {
         nullable: true
     })
     address: string;
-    
+
     @OneToMany(() => CinemaRoom, room => room.location)
     rooms: CinemaRoom[];
 }

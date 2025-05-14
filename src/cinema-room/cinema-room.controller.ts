@@ -12,7 +12,6 @@ export class CinemaRoomController {
 
   @Post()
   create(@Body() createCinemaRoomDto: CreateCinemaRoomDto) {
-    console.log(process.env.DATABASE_USER)
     return this.cinemaRoomService.create(createCinemaRoomDto);
   }
 
