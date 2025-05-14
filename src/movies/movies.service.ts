@@ -1,26 +1,67 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateMovieDto } from './dto/create-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Movie } from './entities/movie.entity';
+import { Repository } from 'typeorm';
+import { CinemaRoom } from '.././cinema-room/entities/cinema-room.entity';
 
 @Injectable()
 export class MoviesService {
-  create(createMovieDto: CreateMovieDto) {
-    return 'This action adds a new movie';
+  constructor(
+    @InjectRepository(Movie) private readonly movieRepository : Repository<Movie>,
+    @InjectRepository(CinemaRoom) private readonly cinemaRoomRepository : Repository<CinemaRoom>
+  ){}
+
+  async create(createMovieDto: CreateMovieDto) {
+    const cinemaRoom = await this.cinemaRoomRepository.findOneBy({id: createMovieDto.cinemaRoomId})
+    if(!cinemaRoom) {
+      let errors : string[] = []
+      errors.push('The CinemaRoom does not exist')
+      throw new NotFoundException(errors)
+    }
+    return this.movieRepository.save({
+      ...createMovieDto,
+      cinemaRoom
+    })
   }
 
   findAll() {
-    return `This action returns all movies`;
+    return this.movieRepository.find()
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} movie`;
+  async findOne(id: number) {
+    const movie = await this.movieRepository.findOne({
+      where: {
+        id
+      }
+    })
+    if(!movie) {
+      throw new NotFoundException("Esta movie no existe")
+    } 
+    return movie;
   }
 
-  update(id: number, updateMovieDto: UpdateMovieDto) {
-    return `This action updates a #${id} movie`;
+  async update(id: number, updateMovieDto: UpdateMovieDto) {
+    const movie = await this.findOne(id)
+    Object.assign(movie, updateMovieDto)
+    if(updateMovieDto.cinemaRoomId){
+      const cinemaRoom = await this.cinemaRoomRepository.findOneBy({
+        id: updateMovieDto.cinemaRoomId
+      })
+      if(!cinemaRoom) {
+        let errors : string[] = []
+        errors.push('The cinemaRoom does not exist')
+        throw new NotFoundException(errors)
+      }
+      movie.cinemaRoom = cinemaRoom;
+    }
+    return await this.movieRepository.save(movie)
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} movie`;
+  async remove(id: number) {
+    const movie = await this.findOne(id)
+    await this.movieRepository.delete(movie);
+    return "Movie eliminada"
   }
 }

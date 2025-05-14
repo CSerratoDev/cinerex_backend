@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { LocationModule } from './location/location.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeOrmConfig } from './config/typeorm.config';
 import { MoviesModule } from './movies/movies.module';
-import { TheatersModule } from './theaters/theaters.module';
+import { SeatsModule } from './seats/seats.module';
+import { TicketsModule } from './tickets/tickets.module';
+import { CinemaRoomModule } from './cinema-room/cinema-room.module';
 
 @Module({
   imports: [ConfigModule.forRoot({
@@ -17,8 +17,10 @@ import { TheatersModule } from './theaters/theaters.module';
     inject: [ConfigService]
   }),
   LocationModule, 
-  MoviesModule, TheatersModule],
-  controllers: [AppController],
-  providers: [AppService],
+  MoviesModule,
+  SeatsModule, 
+  TicketsModule, 
+  CinemaRoomModule
+  ]
 })
 export class AppModule {}
