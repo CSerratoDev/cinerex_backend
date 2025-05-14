@@ -8,7 +8,7 @@ import { Repository } from 'typeorm';
 @Injectable()
 export class LocationService {
   constructor(
-    @InjectRepository(Location) private readonly locationRepository: Repository<Location> 
+    @InjectRepository(Location) private readonly locationRepository: Repository<Location>
   ){}
 
   create(createLocationDto: CreateLocationDto) {

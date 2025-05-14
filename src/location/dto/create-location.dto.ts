@@ -1,5 +1,10 @@
-import { IsNotEmpty } from 'class-validator';  
+import { IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';  
 export class CreateLocationDto {
-    @IsNotEmpty({message: 'El nombre de Location no puede estar vacio'})
+    @IsNotEmpty({message: "Location name can't be empty"})
+    @IsString()
+    @MaxLength(38)
     name: string;
+    @IsString()
+    @IsOptional()
+    address: string;
 }

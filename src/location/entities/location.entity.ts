@@ -1,4 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { IsOptional } from "class-validator";
+import { CinemaRoom } from "../../cinema-room/entities/cinema-room.entity";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Location {
@@ -6,7 +8,15 @@ export class Location {
     id: number;
     @Column({
         type: 'varchar',
-        length: 60
+        length: 38
     })
     name: string;
+    @Column({
+        type: 'text',
+        nullable: true
+    })
+    address: string;
+    
+    @OneToMany(() => CinemaRoom, room => room.location)
+    rooms: CinemaRoom[];
 }

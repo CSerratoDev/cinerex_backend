@@ -27,14 +27,17 @@ export class MoviesService {
   }
 
   findAll() {
-    return this.movieRepository.find()
+    return this.movieRepository.find({
+      relations: ['cinemaRoom']
+    })
   }
 
   async findOne(id: number) {
     const movie = await this.movieRepository.findOne({
       where: {
         id
-      }
+      },
+      relations: ['cinemaRoom']
     })
     if(!movie) {
       throw new NotFoundException("Esta movie no existe")

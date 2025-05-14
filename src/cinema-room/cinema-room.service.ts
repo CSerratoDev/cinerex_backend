@@ -4,6 +4,7 @@ import { UpdateCinemaRoomDto } from './dto/update-cinema-room.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CinemaRoom } from './entities/cinema-room.entity';
 import { Repository } from 'typeorm';
+import { Seat } from '../seats/entities/seat.entity';
 
 @Injectable()
 export class CinemaRoomService {
@@ -11,8 +12,20 @@ export class CinemaRoomService {
     @InjectRepository(CinemaRoom) private readonly cinemaRoomRepository : Repository<CinemaRoom>
   ){}
 
-  create(createCinemaRoomDto: CreateCinemaRoomDto) {
-    return this.cinemaRoomRepository.save(createCinemaRoomDto);
+  async create(createCinemaRoomDto: CreateCinemaRoomDto): Promise<CinemaRoom>{
+    const {name, seats} = createCinemaRoomDto;
+
+    const room = new CinemaRoom();
+    room.name = name;
+
+    room.seats = seats.map(seatData => {
+      const seat = new Seat();
+      seat.row = seatData.code;
+      seat.status = seatData.isAvailable ?? true;
+      return seat;
+    });
+    const savedRoom = await this.cinemaRoomRepository.save(room);
+    return savedRoom;
   }
 
   findAll() {

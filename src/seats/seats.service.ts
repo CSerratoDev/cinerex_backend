@@ -4,6 +4,7 @@ import { UpdateSeatDto } from './dto/update-seat.dto';
 
 @Injectable()
 export class SeatsService {
+  
   create(createSeatDto: CreateSeatDto) {
     return 'This action adds a new seat';
   }
