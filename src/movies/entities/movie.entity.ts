@@ -12,9 +12,16 @@ export class Movie {
         nullable: false
     })
     description: string;
+    @Column({type: 'int', unsigned: true})
+    duration: number;
+    @Column({ type: 'timestamp', nullable: false })
+    startTime: Date; 
     @Column()
-    duration: string;
-    @ManyToOne(() => CinemaRoom, (cinemaRoom) => cinemaRoom.movies, {eager: false})
-    @JoinColumn({name: 'cinema_room_id'})
+    cinemaRoomId: number
+    @ManyToOne(() => CinemaRoom, (cinemaRoom) => cinemaRoom.movies, {
+        eager: false
+        //onDelete: 'CASCADE'
+    })
+    @JoinColumn({name: 'cinemaRoomId'})
     cinemaRoom: CinemaRoom;
 }

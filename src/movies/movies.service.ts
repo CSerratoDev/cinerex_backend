@@ -1,9 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateMovieDto } from './dto/create-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Movie } from './entities/movie.entity';
-import { Repository } from 'typeorm';
+import { Between, Repository } from 'typeorm';
 import { CinemaRoom } from '.././cinema-room/entities/cinema-room.entity';
 
 @Injectable()
@@ -13,17 +13,40 @@ export class MoviesService {
     @InjectRepository(CinemaRoom) private readonly cinemaRoomRepository : Repository<CinemaRoom>
   ){}
 
-  async create(createMovieDto: CreateMovieDto) {
-    const cinemaRoom = await this.cinemaRoomRepository.findOneBy({id: createMovieDto.cinemaRoomId})
-    if(!cinemaRoom) {
-      let errors : string[] = []
-      errors.push('The CinemaRoom does not exist')
-      throw new NotFoundException(errors)
+  async create(createMovieDto: CreateMovieDto) : Promise<Movie> {
+    const { title, description, duration, startTime, cinemaRoomId} = createMovieDto;
+
+    const parsedStartTime = new Date(startTime);
+    if(isNaN(parsedStartTime.getTime())) {
+      throw new BadRequestException('startTime must be a valid ISO 8601 date string')
     }
-    return this.movieRepository.save({
-      ...createMovieDto,
-      cinemaRoom
-    })
+
+    const cinemaRoom = await this.cinemaRoomRepository.findOneBy({id: cinemaRoomId });
+    if(!cinemaRoom) { 
+      throw new NotFoundException('CinemaRoom not found')
+    }
+    const overlappingMovie = await this.movieRepository.findOne({
+      where: {
+        cinemaRoom: { id: cinemaRoomId },
+        startTime: Between(
+          parsedStartTime,
+          new Date(new Date(startTime).getTime() + duration * 60000) // Duración en minutos
+        ),
+      },
+    });
+
+    if (overlappingMovie) {
+      throw new ConflictException('There is already a movie scheduled at this time in this cinema room.');
+    }
+      const movie = this.movieRepository.create({
+        title,
+        description,
+        duration,
+        startTime: parsedStartTime,
+        cinemaRoom,
+      });
+      
+    return await this.movieRepository.save(movie);
   }
 
   findAll() {

@@ -1,26 +1,49 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTicketDto } from './dto/create-ticket.dto';
-import { UpdateTicketDto } from './dto/update-ticket.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Ticket } from './entities/ticket.entity';
+import { Repository, In } from 'typeorm';
+import { Seat } from '../seats/entities/seat.entity';
+import { Movie } from '../movies/entities/movie.entity';
 
 @Injectable()
 export class TicketsService {
-  create(createTicketDto: CreateTicketDto) {
-    return 'This action adds a new ticket';
+  constructor(
+    @InjectRepository(Ticket) 
+    private readonly ticketRepository : Repository<Ticket>,
+    @InjectRepository(Seat) 
+    private readonly seatRepository : Repository<Seat>,
+    @InjectRepository(Movie)
+    private readonly movieRepository : Repository<Movie>
+  ){}
+
+  async create(createTicketDto: CreateTicketDto) : Promise<Ticket> {
+    const movie = await this.movieRepository.findOneBy({ id: createTicketDto.movieId });
+    if(!movie) throw new NotFoundException('Movie not found');
+    
+    const seats = await this.seatRepository.findBy({ id: In(createTicketDto.seatIds) });
+    if(seats.length !== createTicketDto.seatIds.length) {
+      throw new BadRequestException('Some seat IDs are invalid');
+    }
+
+    const ticket = this.ticketRepository.create({
+      movie,
+      seats,
+      total: createTicketDto.total
+    });
+
+    return this.ticketRepository.save(ticket);
   }
 
-  findAll() {
-    return `This action returns all tickets`;
+  findAll() : Promise<Ticket[]> {
+    return this.ticketRepository.find();
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} ticket`;
+    return this.ticketRepository.findOne({where: {id}});
   }
 
-  update(id: number, updateTicketDto: UpdateTicketDto) {
-    return `This action updates a #${id} ticket`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} ticket`;
+  async remove(id: number) {
+    await this.ticketRepository.delete(id);
   }
 }
