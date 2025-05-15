@@ -7,6 +7,7 @@ import { MoviesModule } from './movies/movies.module';
 import { SeatsModule } from './seats/seats.module';
 import { TicketsModule } from './tickets/tickets.module';
 import { CinemaRoomModule } from './cinema-room/cinema-room.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [ConfigModule.forRoot({
@@ -20,7 +21,8 @@ import { CinemaRoomModule } from './cinema-room/cinema-room.module';
   MoviesModule,
   SeatsModule, 
   TicketsModule, 
-  CinemaRoomModule
+  CinemaRoomModule, 
+  AuthModule
   ]
 })
 export class AppModule {}
