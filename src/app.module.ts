@@ -8,6 +8,7 @@ import { SeatsModule } from './seats/seats.module';
 import { TicketsModule } from './tickets/tickets.module';
 import { CinemaRoomModule } from './cinema-room/cinema-room.module';
 import { AuthModule } from './auth/auth.module';
+import { SeederModule } from './seeder/seeder.module';
 
 @Module({
   imports: [ConfigModule.forRoot({
@@ -22,7 +23,9 @@ import { AuthModule } from './auth/auth.module';
   SeatsModule, 
   TicketsModule, 
   CinemaRoomModule, 
-  AuthModule
-  ]
+  AuthModule, 
+  SeederModule
+  ],
+  providers: []
 })
 export class AppModule {}

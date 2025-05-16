@@ -10,6 +10,6 @@ export class User {
     email: string;
     @Column('text')
     password: string;
-    @Column("simple-array", { default: "Employee"})
+    @Column("simple-array", { default: "User"})
     role: string[];
 }

@@ -12,7 +12,7 @@ export class MoviesController {
   create(@Body() createMovieDto: CreateMovieDto) {
     return this.moviesService.create(createMovieDto);
   }
-
+  
   @Get()
   findAll() {
     return this.moviesService.findAll();

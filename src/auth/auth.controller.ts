@@ -6,32 +6,31 @@ import { LoginUserDto } from './dto/login-user.dto';
 import { Cookies } from './decorators/cookies.decorator';
 import { Response } from 'express';
 
-@Controller('auth')
+@Controller('AdminAuth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService
   ) {}
-
+  
   @Post("signup")
   signUp(@Body() createUserDto: CreateUserDto) {
     return this.authService.signUp(createUserDto);
   }
-
   @Post("login")
   async login(
     @Body() loginUserDto: LoginUserDto,
     @Res({passthrough: true}) response : Response,
-    @Cookies() Cookies: any){
-      const token = await this.authService.login(loginUserDto)
+    @Cookies() cookies: any){
+      const access_token = await this.authService.login(loginUserDto)
       let expireDate = new Date();
-      expireDate.setDate(expireDate.getDay() + 7);
-      response.cookie(TOKEN_NAME, token, {
+      expireDate.setDate(expireDate.getDate() + 7);
+      response.cookie(TOKEN_NAME, access_token, {
         httpOnly: true,	
         secure: true,
         sameSite: 'none',
         expires: expireDate,
         maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
       });
-    return token;
+    return {access_token};
   }
 }
