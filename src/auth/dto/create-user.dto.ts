@@ -8,7 +8,6 @@ export class CreateUserDto {
     @IsString()
     @MinLength(8)
     password: string;
-    @IsNotEmpty({message: "role can't be empty"})
     @IsIn(["Admin", "User"])
     role: string[];
 }

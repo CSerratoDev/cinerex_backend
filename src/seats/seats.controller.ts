@@ -26,9 +26,4 @@ export class SeatsController {
   update(@Param('id') id: string, @Body() updateSeatDto: UpdateSeatDto) {
     return this.seatsService.update(+id, updateSeatDto);
   }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.seatsService.remove(+id);
-  }
 }

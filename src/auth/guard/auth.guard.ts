@@ -18,7 +18,7 @@ export class AuthGuard implements CanActivate {
         let token = this.extractTokenFromHeader(request);
         if (!token) {
             token = request.cookies?.[TOKEN_NAME];
-            if(!token) throw new UnauthorizedException();
+            if(!token) throw new UnauthorizedException("Token incorrect"); 
         }
         try {
             const payload = await this.jwtService.verifyAsync(
@@ -29,11 +29,10 @@ export class AuthGuard implements CanActivate {
             );
             request['user'] = payload;
         } catch {
-            throw new UnauthorizedException();
+            throw new UnauthorizedException("User not found");
         }
         return true;
     }
-
     private extractTokenFromHeader(request: Request): string | undefined {
         const [type, token] = request.headers.authorization?.split(' ') ?? [];
         return type === 'Bearer' ? token : undefined;

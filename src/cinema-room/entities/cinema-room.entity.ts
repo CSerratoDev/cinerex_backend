@@ -14,10 +14,13 @@ export class CinemaRoom {
     })
     name: string;
 
-    @Column()
-    locationId: number;
+    @Column({nullable: true})
+    locationId: number | null;
 
-    @ManyToOne(() => Location, location => location.rooms, { onDelete: 'CASCADE' })
+    @ManyToOne(() => Location, location => location.rooms, { 
+        nullable: true,
+        onDelete: 'SET NULL' 
+    })
     @JoinColumn({ name: 'locationId' }) // Asegura que esta relación use esa columna
     location: Location;
 
@@ -25,6 +28,9 @@ export class CinemaRoom {
     @OneToMany(() => Movie, (movie) => movie.cinemaRoom)
     movies: Movie[];
 
-    @OneToMany(() => Seat, seat => seat.cinemaRoom, {cascade: true, eager:true})
+    @OneToMany(() => Seat, seat => seat.cinemaRoom, {
+        cascade: true, 
+        eager:true
+    })
     seats: Seat[];
 }

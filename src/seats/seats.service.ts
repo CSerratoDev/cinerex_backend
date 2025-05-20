@@ -1,16 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { CreateSeatDto } from './dto/create-seat.dto';
 import { UpdateSeatDto } from './dto/update-seat.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Seat } from './entities/seat.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class SeatsService {
+  @InjectRepository(Seat) private readonly seatRepository : Repository<Seat>
   
   create(createSeatDto: CreateSeatDto) {
-    return 'This action adds a new seat';
-  }
+    return "created seat"
+  } 
 
   findAll() {
-    return `This action returns all seats`;
+    return this.seatRepository.find()
   }
 
   findOne(id: number) {
@@ -19,9 +23,5 @@ export class SeatsService {
 
   update(id: number, updateSeatDto: UpdateSeatDto) {
     return `This action updates a #${id} seat`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} seat`;
   }
 }

@@ -9,7 +9,7 @@ export class Seat {
     row: string;
     @Column({default: true})
     status: boolean;
-    @ManyToOne(() => CinemaRoom, room => room.seats)
+    @ManyToOne(() => CinemaRoom, room => room.seats, { onDelete: 'CASCADE'})
     @JoinColumn({name: 'cinema_room_id'})
     cinemaRoom: CinemaRoom;
 }

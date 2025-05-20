@@ -3,7 +3,10 @@ import { CinemaRoomService } from './cinema-room.service';
 import { CreateCinemaRoomDto } from './dto/create-cinema-room.dto';
 import { UpdateCinemaRoomDto } from './dto/update-cinema-room.dto';
 import { IdValidationPipe } from 'src/common/pipes/id-validation/id-validation.pipe';
+import { Auth } from '../auth/decorators/auth.decorator';
+import { ROLES } from 'src/auth/constants/roles.constants';
 
+//@Auth()
 @Controller('cinema-room')
 export class CinemaRoomController {
   constructor(

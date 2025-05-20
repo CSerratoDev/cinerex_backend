@@ -4,11 +4,13 @@ import { UpdateLocationDto } from './dto/update-location.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Location } from './entities/location.entity';
 import { Repository } from 'typeorm';
+import { CinemaRoom } from 'src/cinema-room/entities/cinema-room.entity';
 
 @Injectable()
 export class LocationService {
   constructor(
-    @InjectRepository(Location) private readonly locationRepository: Repository<Location>
+    @InjectRepository(Location) private readonly locationRepository: Repository<Location>,
+    @InjectRepository(CinemaRoom) private readonly cinemaRoomRepository : Repository<CinemaRoom>
   ){}
 
   create(createLocationDto: CreateLocationDto) {
@@ -20,7 +22,10 @@ export class LocationService {
   }
 
   async findOne(id: number) {
-    const location = await this.locationRepository.findOneBy({id})
+    const location = await this.locationRepository.findOne({
+      where: { id },
+      relations: ['rooms']
+    })
     if(!location) {
       throw new NotFoundException("La localidad no existe")
     }
@@ -28,14 +33,30 @@ export class LocationService {
   }
 
   async update(id: number, updateLocationDto: UpdateLocationDto) {
-    const location = await this.findOne(id)
-    location.name = updateLocationDto.name;
-    return await this.locationRepository.save(location);
+    const location = await this.findOne(id);
+    Object.assign(location, updateLocationDto);
+    await this.locationRepository.save(location);
+    return await this.findOne(id);
   }
 
   async remove(id: number) {
-    const location = await this.findOne(id)
-    await this.locationRepository.delete(location);
-    return "Location eliminada";
+    const location = await this.locationRepository.findOne({
+      where : { id },
+      relations: ['rooms'],
+    });
+
+    if(!location) {
+      throw new NotFoundException("Location not found");
+    }
+
+    if(location.rooms?.length) {
+      for(const room of location.rooms) {
+        room.locationId = null;
+      }
+      await this.cinemaRoomRepository.save(location.rooms);
+    }
+    await this.locationRepository.remove(location);
+    return "Location eliminated"
+
   }
 }

@@ -21,16 +21,16 @@ export class AuthController {
     @Body() loginUserDto: LoginUserDto,
     @Res({passthrough: true}) response : Response,
     @Cookies() cookies: any){
-      const access_token = await this.authService.login(loginUserDto)
+      const token = await this.authService.login(loginUserDto)
       let expireDate = new Date();
       expireDate.setDate(expireDate.getDate() + 7);
-      response.cookie(TOKEN_NAME, access_token, {
+      response.cookie(TOKEN_NAME, token, {
         httpOnly: true,	
         secure: true,
         sameSite: 'none',
         expires: expireDate,
         maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
       });
-    return {access_token};
+    return token;
   }
 }

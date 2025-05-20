@@ -30,8 +30,8 @@ async create(createCinemaRoomDto: CreateCinemaRoomDto): Promise<CinemaRoom> {
   // Asignar los asientos
   room.seats = seats.map(seatData => {
     const seat = new Seat();
-    seat.row = seatData.code; // ← usa el campo real del DTO
-    seat.status = seatData.isAvailable ?? true;
+    seat.row = seatData.code; 
+    seat.status = typeof seatData.isAvailable === 'boolean' ? seatData.isAvailable : true;
     return seat;
   });
 

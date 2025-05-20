@@ -45,5 +45,6 @@ export class TicketsService {
 
   async remove(id: number) {
     await this.ticketRepository.delete(id);
+    return "Ticket eliminated"
   }
 }
